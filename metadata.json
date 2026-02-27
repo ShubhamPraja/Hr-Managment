@@ -1,0 +1,7 @@
+{
+  "name": "ZingHR-Inspired HRMS Clone",
+  "description": "A comprehensive enterprise-grade HR Management System featuring dashboards, employee tracking, attendance logs, leave management, and payroll insights.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
