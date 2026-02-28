@@ -37,36 +37,36 @@ const Login: React.FC = () => {
       <div className="w-full max-w-md p-8 bg-white rounded-3xl border border-slate-200 shadow-2xl relative z-10">
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-3xl shadow-xl shadow-blue-200 mb-4">Z</div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">ZingHR <span className="text-blue-600">Enterprise</span></h1>
-          <p className="text-slate-500 font-medium">Global Workforce Solutions</p>
+          <h1 className="ui-title-md font-heading text-slate-900 tracking-tight">ZingHR <span className="text-blue-600">Enterprise</span></h1>
+          <p className="ui-subtitle text-slate-500 font-medium">Global Workforce Solutions</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-bold">
+          <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 ui-subtitle font-bold">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 ml-1">Work Email</label>
+            <label className="ui-subtitle font-semibold text-slate-700 ml-1">Work Email</label>
             <input 
               required
               type="email"
               placeholder="name@company.com"
-              className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-medium"
+              className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-medium text-[0.93rem]"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 ml-1">Password</label>
+            <label className="ui-subtitle font-semibold text-slate-700 ml-1">Password</label>
             <input 
               required
               type="password"
-              placeholder="••••••••"
-              className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-medium"
+              placeholder="********"
+              className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-medium text-[0.93rem]"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -75,7 +75,7 @@ const Login: React.FC = () => {
           <button 
             disabled={isLoading}
             type="submit"
-            className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-lg hover:bg-blue-700 active:scale-[0.98] transition-all shadow-xl shadow-blue-200 flex items-center justify-center disabled:opacity-50"
+            className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold text-[1rem] hover:bg-blue-700 active:scale-[0.98] transition-all shadow-xl shadow-blue-200 flex items-center justify-center disabled:opacity-50"
           >
             {isLoading ? (
               <svg className="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
@@ -89,11 +89,11 @@ const Login: React.FC = () => {
         <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col items-center gap-4">
           <button 
             onClick={() => router.push('/register')}
-            className="text-blue-600 font-bold text-sm hover:underline underline-offset-4"
+            className="text-blue-600 font-bold text-[0.9rem] hover:underline underline-offset-4"
           >
             Don't have an account? Register Now
           </button>
-          <div className="flex justify-between w-full text-xs font-bold text-slate-400">
+          <div className="flex justify-between w-full text-[0.78rem] font-bold text-slate-400">
             <a href="#" className="hover:text-blue-600 transition-colors">Forgot Password?</a>
             <a href="#" className="hover:text-blue-600 transition-colors">Contact Support</a>
           </div>
@@ -104,3 +104,4 @@ const Login: React.FC = () => {
 };
 
 export default Login;
+

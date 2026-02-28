@@ -46,12 +46,12 @@ const Register: React.FC = () => {
       <div className="w-full max-w-xl p-10 bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl relative z-10">
         <div className="flex flex-col items-center mb-10">
           <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-3xl shadow-xl shadow-blue-200 mb-6 transition-transform hover:scale-110">Z</div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight text-center">Register Your <span className="text-blue-600">Company</span></h1>
-          <p className="text-slate-500 font-medium text-center mt-2">Start managing your global workforce with ZingHR Clone.</p>
+          <h1 className="ui-page-title font-heading text-slate-900 tracking-tight text-center">Register Your <span className="text-blue-600">Company</span></h1>
+          <p className="ui-subtitle text-slate-500 font-medium text-center mt-2">Start managing your global workforce with ZingHR Clone.</p>
         </div>
 
         {error && (
-          <div className="mb-8 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-bold animate-in fade-in slide-in-from-top-2">
+          <div className="mb-8 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 ui-subtitle font-bold animate-in fade-in slide-in-from-top-2">
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
               {error}
@@ -61,12 +61,12 @@ const Register: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Organization Details</label>
+            <label className="ui-label text-slate-400 ml-1">Organization Details</label>
             <input 
               required
               type="text"
               placeholder="Your Company Name (e.g. Acme Corp)"
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-semibold"
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-semibold text-[0.93rem]"
               value={formData.organizationName}
               onChange={(e) => setFormData({...formData, organizationName: e.target.value})}
             />
@@ -74,23 +74,23 @@ const Register: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Admin Full Name</label>
+              <label className="ui-label text-slate-400 ml-1">Admin Full Name</label>
               <input 
                 required
                 type="text"
                 placeholder="John Doe"
-                className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-semibold"
+                className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-semibold text-[0.93rem]"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Work Email</label>
+              <label className="ui-label text-slate-400 ml-1">Work Email</label>
               <input 
                 required
                 type="email"
                 placeholder="admin@company.com"
-                className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-semibold"
+                className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-semibold text-[0.93rem]"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
               />
@@ -98,12 +98,12 @@ const Register: React.FC = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Secure Password</label>
+            <label className="ui-label text-slate-400 ml-1">Secure Password</label>
             <input 
               required
               type="password"
-              placeholder="••••••••"
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-semibold"
+              placeholder="********"
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-slate-900 font-semibold text-[0.93rem]"
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
             />
@@ -113,7 +113,7 @@ const Register: React.FC = () => {
             <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-xs text-blue-700 font-medium leading-relaxed">
+            <p className="text-[0.79rem] text-blue-700 font-medium leading-relaxed">
               By registering, you become the **Primary Admin**. You can later create credentials for your HR team and Employees from the management dashboard.
             </p>
           </div>
@@ -121,7 +121,7 @@ const Register: React.FC = () => {
           <button 
             disabled={isLoading}
             type="submit"
-            className="w-full py-5 bg-blue-600 text-white rounded-[1.25rem] font-black text-lg hover:bg-blue-700 active:scale-[0.98] transition-all shadow-xl shadow-blue-200 flex items-center justify-center disabled:opacity-50"
+            className="w-full py-5 bg-blue-600 text-white rounded-[1.25rem] font-black text-[1rem] hover:bg-blue-700 active:scale-[0.98] transition-all shadow-xl shadow-blue-200 flex items-center justify-center disabled:opacity-50"
           >
             {isLoading ? (
               <svg className="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
@@ -133,10 +133,10 @@ const Register: React.FC = () => {
         </form>
 
         <div className="mt-10 pt-8 border-t border-slate-100 flex flex-col items-center gap-3">
-          <p className="text-sm text-slate-500 font-bold">Already part of a company?</p>
+          <p className="ui-subtitle text-slate-500 font-bold">Already part of a company?</p>
           <button 
             onClick={() => router.push('/')}
-            className="text-blue-600 font-black hover:underline underline-offset-8 decoration-2"
+            className="text-blue-600 font-black text-[0.92rem] hover:underline underline-offset-8 decoration-2"
           >
             Sign in to Workspace
           </button>
@@ -147,3 +147,4 @@ const Register: React.FC = () => {
 };
 
 export default Register;
+

@@ -10,6 +10,16 @@ type Pathname =
   | '/leave'
   | '/payroll'
   | '/settings'
+  | '/recruitment'
+  | '/onboarding'
+  | '/performance'
+  | '/learning'
+  | '/helpdesk'
+  | '/documents'
+  | '/expenses'
+  | '/workforce'
+  | '/compliance'
+  | '/engagement'
   | '/register';
 
 export function NavigationProvider({ children }: { children: ReactNode }) {

@@ -16,11 +16,26 @@ import {
   updateLeave,
 } from '@/api/controllers/leave.controller';
 import {
+  createOnboarding,
+  deleteOnboarding,
+  getOnboarding,
+  updateOnboarding,
+} from '@/api/controllers/onboarding.controller';
+import {
   createPayroll,
   deletePayroll,
   getPayroll,
   updatePayroll,
 } from '@/api/controllers/payroll.controller';
+import {
+  addRecruitmentCandidate,
+  createRecruitment,
+  deleteRecruitment,
+  deleteRecruitmentCandidate,
+  getRecruitment,
+  updateRecruitment,
+  updateRecruitmentCandidate,
+} from '@/api/controllers/recruitment.controller';
 import {
   deleteSettings,
   getSettings,
@@ -130,6 +145,30 @@ const handle = async (request: Request, context: RouteContext) => {
     });
   }
 
+  if (method === 'GET' && path.length === 1 && path[0] === 'onboarding') {
+    return runController({ request, controller: getOnboarding });
+  }
+
+  if (method === 'POST' && path.length === 1 && path[0] === 'onboarding') {
+    return runController({ request, controller: createOnboarding });
+  }
+
+  if (method === 'PUT' && path.length === 2 && path[0] === 'onboarding') {
+    return runController({
+      request,
+      controller: updateOnboarding,
+      params: { recordId: path[1] },
+    });
+  }
+
+  if (method === 'DELETE' && path.length === 2 && path[0] === 'onboarding') {
+    return runController({
+      request,
+      controller: deleteOnboarding,
+      params: { recordId: path[1] },
+    });
+  }
+
   if (method === 'GET' && path.length === 1 && path[0] === 'payroll') {
     return runController({ request, controller: getPayroll });
   }
@@ -151,6 +190,54 @@ const handle = async (request: Request, context: RouteContext) => {
       request,
       controller: deletePayroll,
       params: { recordId: path[1] },
+    });
+  }
+
+  if (method === 'GET' && path.length === 1 && path[0] === 'recruitment') {
+    return runController({ request, controller: getRecruitment });
+  }
+
+  if (method === 'POST' && path.length === 1 && path[0] === 'recruitment') {
+    return runController({ request, controller: createRecruitment });
+  }
+
+  if (method === 'PUT' && path.length === 2 && path[0] === 'recruitment') {
+    return runController({
+      request,
+      controller: updateRecruitment,
+      params: { requisitionId: path[1] },
+    });
+  }
+
+  if (method === 'DELETE' && path.length === 2 && path[0] === 'recruitment') {
+    return runController({
+      request,
+      controller: deleteRecruitment,
+      params: { requisitionId: path[1] },
+    });
+  }
+
+  if (method === 'POST' && path.length === 3 && path[0] === 'recruitment' && path[2] === 'candidates') {
+    return runController({
+      request,
+      controller: addRecruitmentCandidate,
+      params: { requisitionId: path[1] },
+    });
+  }
+
+  if (method === 'PUT' && path.length === 4 && path[0] === 'recruitment' && path[2] === 'candidates') {
+    return runController({
+      request,
+      controller: updateRecruitmentCandidate,
+      params: { requisitionId: path[1], candidateId: path[3] },
+    });
+  }
+
+  if (method === 'DELETE' && path.length === 4 && path[0] === 'recruitment' && path[2] === 'candidates') {
+    return runController({
+      request,
+      controller: deleteRecruitmentCandidate,
+      params: { requisitionId: path[1], candidateId: path[3] },
     });
   }
 
