@@ -55,6 +55,8 @@ const Dashboard: React.FC = () => {
     try {
       const params = new URLSearchParams({
         organizationId: currentUser.organizationId,
+        userId: currentUser.id,
+        role: currentUser.role,
       });
       if (currentUser.organizationDb) {
         params.set('organizationDb', currentUser.organizationDb);
@@ -76,90 +78,100 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     void loadDashboard();
-  }, [currentUser?.organizationId]);
+  }, [currentUser?.organizationId, currentUser?.organizationDb, currentUser?.id, currentUser?.role]);
 
   const topDepartments = useMemo(() => departments.slice(0, 5), [departments]);
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Executive Dashboard</h1>
-          <p className="text-slate-500 font-medium">Insights and activity across your enterprise.</p>
-        </div>
-        <div className="flex gap-2">
+    <div className="space-y-7 motion-fade">
+      <section className="panel-surface rounded-[1.6rem] p-5 md:p-7">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <p className="ui-overline text-[var(--color-text-soft)] mb-2">Control Center</p>
+            <h1 className="ui-page-title font-heading text-[var(--color-text)] tracking-tight">Executive Dashboard</h1>
+            <p className="ui-subtitle text-[var(--color-text-soft)] mt-1">Insights and activity across your enterprise.</p>
+          </div>
           <button
             onClick={() => void loadDashboard()}
-            className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors"
+            className="px-4 py-2.5 rounded-xl bg-[var(--accent-600)] text-white text-sm font-semibold hover:bg-[var(--accent-700)] transition-colors"
           >
             Refresh
           </button>
         </div>
-      </div>
+      </section>
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-semibold">
+        <div className="p-4 rounded-xl border text-sm font-semibold bg-[color:color-mix(in_srgb,var(--danger-500)_12%,transparent)] border-[color:color-mix(in_srgb,var(--danger-500)_25%,transparent)] text-[var(--danger-500)]">
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <KPIItem label="Active Workforce" value={String(kpis.activeWorkforce)} trend={kpis.activeWorkforceTrend} color="blue" />
         <KPIItem label="Daily Attendance" value={`${kpis.dailyAttendance}%`} trend={kpis.dailyAttendanceTrend} color="green" />
         <KPIItem label="Leaves Today" value={String(kpis.leavesToday)} trend={kpis.leavesTodayTrend} color="orange" />
         <KPIItem label="Open Positions" value={String(kpis.openPositions)} trend={kpis.openPositionsTrend} color="purple" />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <div className="xl:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-2 panel-surface p-6 rounded-[1.5rem]">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="font-bold text-slate-800 text-lg">Workforce Attendance Flow</h3>
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <h3 className="ui-section-title font-heading text-[var(--color-text)]">Workforce Attendance Flow</h3>
+            <span className="ui-label text-[var(--color-text-soft)]">
               Pending Leaves: {kpis.pendingLeaves}
             </span>
           </div>
           <div className="h-[340px]">
             {isLoading ? (
-              <div className="h-full flex items-center justify-center text-slate-400 text-sm font-medium">Loading chart...</div>
+              <div className="h-full flex items-center justify-center text-[var(--color-text-soft)] text-sm font-medium">
+                Loading chart...
+              </div>
             ) : chart.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-slate-400 text-sm font-medium">No attendance data yet.</div>
+              <div className="h-full flex items-center justify-center text-[var(--color-text-soft)] text-sm font-medium">
+                No attendance data yet.
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chart}>
                   <defs>
                     <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                      <stop offset="5%" stopColor="var(--accent-600)" stopOpacity={0.24} />
+                      <stop offset="95%" stopColor="var(--accent-600)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dx={-10} />
+                  <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--border-soft)" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--color-text-soft)', fontSize: 12 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--color-text-soft)', fontSize: 12 }} dx={-10} />
                   <Tooltip
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                    cursor={{ stroke: '#3b82f6', strokeWidth: 2 }}
+                    contentStyle={{
+                      borderRadius: '14px',
+                      border: '1px solid var(--border-soft)',
+                      backgroundColor: 'var(--surface-1)',
+                      boxShadow: '0 10px 24px -16px rgba(var(--shadow-color),0.46)',
+                    }}
+                    cursor={{ stroke: 'var(--accent-600)', strokeWidth: 2 }}
                   />
-                  <Area type="monotone" dataKey="attendance" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#chartGradient)" />
+                  <Area type="monotone" dataKey="attendance" stroke="var(--accent-600)" strokeWidth={3} fillOpacity={1} fill="url(#chartGradient)" />
                 </AreaChart>
               </ResponsiveContainer>
             )}
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 className="font-bold text-slate-800 text-lg mb-8">Department Metrics</h3>
+        <div className="panel-surface p-6 rounded-[1.5rem]">
+          <h3 className="ui-section-title font-heading text-[var(--color-text)] mb-8">Department Metrics</h3>
           <div className="space-y-6">
             {topDepartments.length === 0 && !isLoading && (
-              <p className="text-sm text-slate-500">No department data available.</p>
+              <p className="ui-subtitle text-[var(--color-text-soft)]">No department data available.</p>
             )}
             {topDepartments.map((dept) => (
               <DeptStat key={dept.name} name={dept.name} value={dept.value} />
             ))}
           </div>
-          <div className="mt-8 pt-6 border-t border-slate-100">
+          <div className="mt-8 pt-6 border-t border-[var(--border-soft)]">
             <button
               onClick={() => void loadDashboard()}
-              className="w-full py-3 text-sm font-bold text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+              className="w-full py-3 text-sm font-bold text-[var(--accent-600)] hover:bg-[var(--accent-50)] rounded-xl transition-colors"
             >
               Refresh Metrics
             </button>
@@ -170,26 +182,40 @@ const Dashboard: React.FC = () => {
   );
 };
 
-const KPIItem = ({ label, value, trend, color }: any) => {
+const KPIItem = ({
+  label,
+  value,
+  trend,
+  color,
+}: {
+  label: string;
+  value: string;
+  trend: string;
+  color: 'blue' | 'green' | 'orange' | 'purple';
+}) => {
   const colors: any = {
-    blue: 'bg-blue-50 text-blue-600',
-    green: 'bg-green-50 text-green-600',
-    orange: 'bg-orange-50 text-orange-600',
-    purple: 'bg-purple-50 text-purple-600',
+    blue: 'bg-[var(--accent-50)] text-[var(--accent-600)]',
+    green: 'bg-emerald-50 text-emerald-600',
+    orange: 'bg-amber-50 text-amber-600',
+    purple: 'bg-rose-50 text-rose-600',
   };
 
   const trendPositive = String(trend).startsWith('+') || String(trend) === '0%';
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+    <div className="panel-surface rounded-[1.35rem] p-5 md:p-6 transition-transform duration-300 hover:-translate-y-1">
       <div className="flex justify-between items-start mb-4">
-        <p className="text-sm font-bold text-slate-500 uppercase tracking-tight">{label}</p>
-        <span className={`text-xs font-bold px-2 py-1 rounded-lg ${trendPositive ? 'text-green-600' : 'text-red-600'}`}>
+        <p className="ui-label text-[var(--color-text-soft)]">{label}</p>
+        <span
+          className={`text-xs font-bold px-2 py-1 rounded-lg ${
+            trendPositive ? 'text-emerald-600' : 'text-red-600'
+          }`}
+        >
           {trend}
         </span>
       </div>
       <div className="flex items-end justify-between">
-        <h3 className="text-3xl font-black text-slate-900">{value}</h3>
+        <h3 className="font-heading ui-metric text-[var(--color-text)]">{value}</h3>
         <div className={`w-10 h-10 rounded-xl ${colors[color]} flex items-center justify-center`}>
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -202,12 +228,12 @@ const KPIItem = ({ label, value, trend, color }: any) => {
 
 const DeptStat = ({ name, value }: { name: string; value: number }) => (
   <div className="space-y-2">
-    <div className="flex justify-between text-sm font-semibold">
-      <span className="text-slate-600">{name}</span>
-      <span className="text-slate-900">{value}%</span>
+    <div className="flex justify-between text-[0.86rem] font-semibold">
+      <span className="text-[var(--color-text-soft)] leading-6">{name}</span>
+      <span className="text-[var(--color-text)] leading-6">{value}%</span>
     </div>
-    <div className="w-full bg-slate-100 rounded-full h-2">
-      <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${value}%` }}></div>
+    <div className="w-full bg-[var(--surface-3)] rounded-full h-2">
+      <div className="bg-[var(--accent-600)] h-2 rounded-full" style={{ width: `${value}%` }} />
     </div>
   </div>
 );

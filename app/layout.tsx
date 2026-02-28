@@ -1,11 +1,21 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Manrope, Sora } from 'next/font/google';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import './globals.css';
 import 'antd/dist/reset.css';
 import Providers from './providers';
 
-const inter = Inter({ subsets: ['latin'] });
+const manrope = Manrope({
+  subsets: ['latin'],
+  variable: '--font-body',
+  display: 'swap',
+});
+
+const sora = Sora({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'ZingHR Enterprise',
@@ -18,8 +28,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} antialiased bg-slate-50 text-slate-900`}>
+    <html lang="en" className="theme-light" suppressHydrationWarning>
+      <body
+        className={`${manrope.variable} ${sora.variable} min-h-screen antialiased selection:bg-[var(--accent-100)] selection:text-[var(--accent-700)]`}
+        suppressHydrationWarning
+      >
         <AntdRegistry>
           <Providers>{children}</Providers>
         </AntdRegistry>

@@ -23,6 +23,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   register: (name: string, email: string, password: string, organizationName: string) => Promise<{ success: boolean; message?: string }>;
+  updateUser: (patch: Partial<User>) => void;
   logout: () => void;
 }
 
@@ -98,8 +99,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('zing_user');
   };
 
+  const updateUser = (patch: Partial<User>) => {
+    setUser((currentUser) => {
+      if (!currentUser) return currentUser;
+      const updatedUser = { ...currentUser, ...patch };
+      localStorage.setItem('zing_user', JSON.stringify(updatedUser));
+      return updatedUser;
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, register, updateUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -2,9 +2,322 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --font-body: 'Manrope';
+  --font-heading: 'Sora';
+  --text-xs-ui: 0.76rem;
+  --text-sm-ui: 0.89rem;
+  --text-md-ui: 0.965rem;
+  --text-lg-ui: 1.08rem;
+  --text-xl-ui: clamp(1.34rem, 1.1vw + 1rem, 1.85rem);
+  --text-2xl-ui: clamp(1.72rem, 1.2vw + 1.08rem, 2.32rem);
+  --text-hero-ui: clamp(2rem, 2.1vw + 1rem, 2.9rem);
+  --leading-tight-ui: 1.18;
+  --leading-normal-ui: 1.56;
+  --color-bg: #f4f6fb;
+  --color-bg-alt: #edf2ff;
+  --color-text: #112347;
+  --color-text-soft: #4b5f82;
+  --surface-1: #ffffff;
+  --surface-2: #f8faff;
+  --surface-3: #eef4ff;
+  --border-soft: #d8e2f2;
+  --border-strong: #c3d0e7;
+  --shadow-color: 15, 35, 71;
+  --accent-50: #ecf3ff;
+  --accent-100: #dce8ff;
+  --accent-200: #bfd5ff;
+  --accent-500: #2b67f8;
+  --accent-600: #0f4cde;
+  --accent-700: #0b3fb7;
+  --accent-800: #0b2f83;
+  --success-500: #0f9a8a;
+  --warning-500: #d88f16;
+  --danger-500: #d13f57;
+}
+
+.theme-light {
+  --color-bg: #f4f6fb;
+  --color-bg-alt: #edf2ff;
+  --color-text: #112347;
+  --color-text-soft: #4b5f82;
+  --surface-1: #ffffff;
+  --surface-2: #f8faff;
+  --surface-3: #eef4ff;
+  --border-soft: #d8e2f2;
+  --border-strong: #c3d0e7;
+  --shadow-color: 15, 35, 71;
+}
+
+.theme-dark {
+  --color-bg: #090f1d;
+  --color-bg-alt: #0e1629;
+  --color-text: #e4ebff;
+  --color-text-soft: #9fb1d5;
+  --surface-1: #111a2e;
+  --surface-2: #17243f;
+  --surface-3: #1f2f50;
+  --border-soft: #2b3e64;
+  --border-strong: #3e5787;
+  --shadow-color: 3, 8, 18;
+}
+
+[data-accent='ocean'] {
+  --accent-50: #ecf3ff;
+  --accent-100: #dce8ff;
+  --accent-200: #bfd5ff;
+  --accent-500: #2b67f8;
+  --accent-600: #0f4cde;
+  --accent-700: #0b3fb7;
+  --accent-800: #0b2f83;
+}
+
+[data-accent='mint'] {
+  --accent-50: #ecfbf8;
+  --accent-100: #d0f7ef;
+  --accent-200: #a9efe1;
+  --accent-500: #24bea7;
+  --accent-600: #0f9a8a;
+  --accent-700: #0a7f72;
+  --accent-800: #075f57;
+}
+
+[data-accent='sunset'] {
+  --accent-50: #fff5ee;
+  --accent-100: #ffe7d7;
+  --accent-200: #ffd3b7;
+  --accent-500: #e57f49;
+  --accent-600: #c95f27;
+  --accent-700: #ac4d1d;
+  --accent-800: #883715;
+}
+
+[data-accent='rose'] {
+  --accent-50: #fff0f5;
+  --accent-100: #ffddeb;
+  --accent-200: #ffc0d8;
+  --accent-500: #ea5d8a;
+  --accent-600: #d03f6c;
+  --accent-700: #b3335b;
+  --accent-800: #862847;
+}
+
 html,
 body {
   height: 100%;
+}
+
+body {
+  font-family: var(--font-body), ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: var(--text-md-ui);
+  line-height: var(--leading-normal-ui);
+  color: var(--color-text);
+  background: radial-gradient(1200px 600px at 12% -8%, color-mix(in srgb, var(--accent-100) 45%, transparent), transparent 72%),
+    radial-gradient(900px 500px at 92% 0%, color-mix(in srgb, var(--accent-200) 40%, transparent), transparent 74%),
+    linear-gradient(150deg, var(--color-bg), var(--color-bg-alt));
+  transition: background-color 250ms ease, color 250ms ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-heading {
+  font-family: var(--font-heading), var(--font-body), ui-sans-serif, sans-serif;
+  letter-spacing: -0.01em;
+  line-height: var(--leading-tight-ui);
+}
+
+p,
+li,
+button,
+input,
+label,
+textarea,
+select {
+  font-size: var(--text-md-ui);
+}
+
+h1 {
+  font-size: var(--text-2xl-ui);
+  font-weight: 700;
+}
+
+h2 {
+  font-size: var(--text-xl-ui);
+  font-weight: 700;
+}
+
+h3 {
+  font-size: var(--text-lg-ui);
+  font-weight: 650;
+}
+
+.ui-overline {
+  font-size: var(--text-xs-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+}
+
+.ui-page-title {
+  font-size: var(--text-2xl-ui);
+  line-height: var(--leading-tight-ui);
+  font-weight: 700;
+}
+
+.ui-title-md {
+  font-size: var(--text-xl-ui);
+  line-height: var(--leading-tight-ui);
+  font-weight: 700;
+}
+
+.ui-section-title {
+  font-size: var(--text-lg-ui);
+  line-height: 1.24;
+  font-weight: 700;
+}
+
+.ui-subtitle {
+  font-size: var(--text-sm-ui);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.ui-label {
+  font-size: var(--text-xs-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.ui-nav-label {
+  font-size: var(--text-sm-ui);
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.ui-metric {
+  font-size: clamp(1.65rem, 1.32vw + 1rem, 2.5rem);
+  line-height: 1.08;
+  font-weight: 800;
+}
+
+.ant-typography,
+.ant-form-item-label > label,
+.ant-btn,
+.ant-input,
+.ant-select,
+.ant-table,
+.ant-tag {
+  font-family: var(--font-body), ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+.ant-typography {
+  line-height: 1.5 !important;
+}
+
+.ant-table {
+  font-size: var(--text-sm-ui) !important;
+}
+
+.ant-input,
+.ant-select-selector {
+  font-size: var(--text-sm-ui) !important;
+}
+
+.panel-surface {
+  background: color-mix(in srgb, var(--surface-1) 86%, transparent);
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 14px 36px -20px rgba(var(--shadow-color), 0.35);
+  backdrop-filter: blur(8px);
+}
+
+.panel-soft {
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+}
+
+.text-muted {
+  color: var(--color-text-soft);
+}
+
+.glass-accent {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-200) 34%, transparent),
+    color-mix(in srgb, var(--accent-100) 16%, transparent)
+  );
+  border: 1px solid color-mix(in srgb, var(--accent-200) 50%, var(--border-soft));
+}
+
+.ring-accent {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-200) 52%, transparent);
+}
+
+.motion-rise {
+  animation: rise-in 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.motion-fade {
+  animation: fade-in 420ms ease both;
+}
+
+.motion-pop {
+  animation: pop-in 340ms cubic-bezier(0.2, 0.8, 0.24, 1.15) both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background-image: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--surface-2) 88%, transparent) 0%,
+    color-mix(in srgb, var(--surface-3) 92%, transparent) 40%,
+    color-mix(in srgb, var(--surface-2) 88%, transparent) 80%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.9s linear infinite;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -14,4 +327,137 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.theme-dark .bg-white {
+  background-color: var(--surface-1) !important;
+}
+
+.theme-dark .bg-slate-50,
+.theme-dark .bg-slate-50\/50 {
+  background-color: var(--surface-2) !important;
+}
+
+.theme-dark .bg-slate-100 {
+  background-color: var(--surface-3) !important;
+}
+
+.theme-dark .text-slate-900,
+.theme-dark .text-slate-800,
+.theme-dark .text-slate-700 {
+  color: var(--color-text) !important;
+}
+
+.theme-dark .text-slate-600,
+.theme-dark .text-slate-500,
+.theme-dark .text-slate-400 {
+  color: var(--color-text-soft) !important;
+}
+
+.theme-dark .border-slate-200,
+.theme-dark .border-slate-100 {
+  border-color: var(--border-soft) !important;
+}
+
+.theme-dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-soft) !important;
+}
+
+.theme-dark .hover\:bg-slate-50:hover {
+  background-color: color-mix(in srgb, var(--surface-3) 68%, transparent) !important;
+}
+
+.theme-dark .hover\:bg-slate-100:hover {
+  background-color: color-mix(in srgb, var(--surface-3) 90%, transparent) !important;
+}
+
+.theme-dark .bg-slate-800 {
+  background-color: #0e1629 !important;
+}
+
+.theme-dark .bg-slate-900 {
+  background-color: #090f1d !important;
+}
+
+.bg-blue-50 {
+  background-color: var(--accent-50) !important;
+}
+
+.bg-blue-100 {
+  background-color: var(--accent-100) !important;
+}
+
+.bg-blue-500,
+.bg-blue-600 {
+  background-color: var(--accent-600) !important;
+}
+
+.bg-blue-700 {
+  background-color: var(--accent-700) !important;
+}
+
+.from-blue-600 {
+  --tw-gradient-from: var(--accent-600) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: color-mix(in srgb, var(--accent-600) 0%, transparent) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.to-blue-700 {
+  --tw-gradient-to: var(--accent-700) var(--tw-gradient-to-position) !important;
+}
+
+.text-blue-600,
+.text-blue-700 {
+  color: var(--accent-600) !important;
+}
+
+.border-blue-200 {
+  border-color: var(--accent-200) !important;
+}
+
+.hover\:bg-blue-50:hover {
+  background-color: var(--accent-50) !important;
+}
+
+.hover\:bg-blue-700:hover {
+  background-color: var(--accent-700) !important;
+}
+
+.focus\:ring-blue-500:focus {
+  --tw-ring-color: color-mix(in srgb, var(--accent-500) 55%, transparent) !important;
+}
+
+.theme-dark .ant-card,
+.theme-dark .ant-modal-content,
+.theme-dark .ant-dropdown-menu,
+.theme-dark .ant-popover-inner {
+  background: var(--surface-1) !important;
+  border: 1px solid var(--border-soft) !important;
+}
+
+.theme-dark .ant-table-wrapper .ant-table-thead > tr > th {
+  background: var(--surface-2) !important;
+  color: var(--color-text) !important;
+  border-bottom-color: var(--border-strong) !important;
+}
+
+.theme-dark .ant-table-wrapper .ant-table-tbody > tr > td {
+  border-bottom-color: var(--border-soft) !important;
+  color: var(--color-text-soft) !important;
+}
+
+.theme-dark .ant-input,
+.theme-dark .ant-input-number,
+.theme-dark .ant-select-selector,
+.theme-dark .ant-picker,
+.theme-dark .ant-input-affix-wrapper {
+  background: var(--surface-2) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--color-text) !important;
+}
+
+.theme-dark .ant-select-selection-item,
+.theme-dark .ant-input::placeholder,
+.theme-dark .ant-input-number-input::placeholder {
+  color: var(--color-text-soft) !important;
 }

@@ -229,11 +229,6 @@ export const updateUser = async (req: Request, res: Response) => {
   const actorRole = String(body.creatorRole || body.actorRole || 'Employee');
   const actorUserId = String(body.actorUserId || '').trim();
 
-  if (actorRole === 'Employee') {
-    res.status(403).json({ message: 'Employees are not allowed to update user credentials' });
-    return;
-  }
-
   const { tenantConnection, dbName } = tenantScope;
   const User = getUserModel(tenantConnection);
 
@@ -243,9 +238,41 @@ export const updateUser = async (req: Request, res: Response) => {
     return;
   }
 
-  if (actorRole === 'HR' && targetUser.role !== 'Employee') {
+  const isSelfUpdate = !!actorUserId && actorUserId === String(targetUser._id);
+
+  if (actorRole === 'Employee' && !isSelfUpdate) {
+    res.status(403).json({ message: 'Employees are not allowed to update other user credentials' });
+    return;
+  }
+
+  if (!isSelfUpdate && actorRole === 'HR' && targetUser.role !== 'Employee') {
     res.status(403).json({ message: 'HR can update Employee credentials only' });
     return;
+  }
+
+  if (isSelfUpdate) {
+    const baseAllowedSelfFields = [
+      'avatar',
+      'password',
+      'actorRole',
+      'creatorRole',
+      'actorUserId',
+      'organizationId',
+      'organizationDb',
+    ];
+    const adminExtraSelfFields = ['name', 'email', 'phoneCountryCode', 'phoneNumber'];
+
+    const allowedSelfFields = new Set(
+      actorRole === 'Admin'
+        ? [...baseAllowedSelfFields, ...adminExtraSelfFields]
+        : baseAllowedSelfFields
+    );
+
+    const disallowedField = Object.keys(body).find((key) => !allowedSelfFields.has(key));
+    if (disallowedField) {
+      res.status(403).json({ message: `You cannot update "${disallowedField}" from self-service profile` });
+      return;
+    }
   }
 
   if (actorUserId && actorUserId === String(targetUser._id) && targetUser.role === 'Admin') {

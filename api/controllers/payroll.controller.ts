@@ -5,12 +5,43 @@ import { getPayrollRecordModel } from '../models/PayrollRecord';
 import { getUserModel } from '../models/User';
 import { resolveTenantOrFail, toNumber } from './shared';
 
+const toNonNegativeNumber = (value: unknown) => Math.max(0, toNumber(value, 0));
+
 const parseMonthDate = (monthKey: string) => {
   if (!/^\d{4}-\d{2}$/.test(monthKey)) return null;
   const monthDate = new Date(`${monthKey}-01T00:00:00`);
   if (Number.isNaN(monthDate.getTime())) return null;
   return monthDate;
 };
+
+const getSalarySeed = (user: any) => {
+  const salaryBreakup = user?.salaryBreakup || {};
+  const basic = toNonNegativeNumber(salaryBreakup.basic);
+  const hra = toNonNegativeNumber(salaryBreakup.hra);
+  const allowancesValue = toNonNegativeNumber(salaryBreakup.allowances);
+  const bonus = toNonNegativeNumber(salaryBreakup.bonus);
+  const deductions = toNonNegativeNumber(salaryBreakup.deductions);
+  const allowances = hra + allowancesValue + bonus;
+  const calculatedNetPay = Math.max(0, basic + allowances - deductions);
+  const recordedNetPay = toNonNegativeNumber(salaryBreakup.netSalary);
+
+  return {
+    basic,
+    allowances,
+    deductions,
+    netPay: recordedNetPay > 0 ? recordedNetPay : calculatedNetPay,
+  };
+};
+
+const hasSalarySeed = (seed: { basic: number; allowances: number; deductions: number; netPay: number }) =>
+  seed.basic > 0 || seed.allowances > 0 || seed.deductions > 0 || seed.netPay > 0;
+
+const isPlaceholderRecord = (record: any) =>
+  String(record?.status || 'Pending') === 'Pending' &&
+  Number(record?.basic || 0) === 0 &&
+  Number(record?.allowances || 0) === 0 &&
+  Number(record?.deductions || 0) === 0 &&
+  Number(record?.netPay || 0) === 0;
 
 export const getPayroll = async (req: Request, res: Response) => {
   const scope = await resolveTenantOrFail(req, res);
@@ -27,11 +58,13 @@ export const getPayroll = async (req: Request, res: Response) => {
   const PayrollRecord = getPayrollRecordModel(tenantConnection);
   const User = getUserModel(tenantConnection);
 
-  const user = await (User as any).findById(userId).select('name');
+  const user = await (User as any).findOne({ _id: userId, organizationId }).select('name salaryBreakup');
   if (!user) {
     res.status(404).json({ message: 'User not found in organization' });
     return;
   }
+
+  const salarySeed = getSalarySeed(user);
 
   let records = await (PayrollRecord as any)
     .find({ organizationId, userId })
@@ -45,10 +78,10 @@ export const getPayroll = async (req: Request, res: Response) => {
       userName: user.name,
       monthKey: toMonthKey(now),
       monthLabel: toMonthLabel(now),
-      basic: 0,
-      allowances: 0,
-      deductions: 0,
-      netPay: 0,
+      basic: salarySeed.basic,
+      allowances: salarySeed.allowances,
+      deductions: salarySeed.deductions,
+      netPay: salarySeed.netPay,
       status: 'Pending',
       processedAt: null,
     });
@@ -56,6 +89,16 @@ export const getPayroll = async (req: Request, res: Response) => {
     records = await (PayrollRecord as any)
       .find({ organizationId, userId })
       .sort({ monthKey: -1, createdAt: -1 });
+  }
+
+  const latestRecord = records[0];
+  if (latestRecord && isPlaceholderRecord(latestRecord) && hasSalarySeed(salarySeed)) {
+    latestRecord.basic = salarySeed.basic;
+    latestRecord.allowances = salarySeed.allowances;
+    latestRecord.deductions = salarySeed.deductions;
+    latestRecord.netPay = salarySeed.netPay;
+    await latestRecord.save();
+    records[0] = latestRecord;
   }
 
   const latest = records[0] || null;
@@ -78,7 +121,7 @@ export const createPayroll = async (req: Request, res: Response) => {
   const PayrollRecord = getPayrollRecordModel(tenantConnection);
   const User = getUserModel(tenantConnection);
 
-  const userDoc = await (User as any).findById(userId).select('name');
+  const userDoc = await (User as any).findOne({ _id: userId, organizationId }).select('name salaryBreakup');
   if (!userDoc) {
     res.status(404).json({ message: 'User not found in organization' });
     return;
@@ -91,10 +134,12 @@ export const createPayroll = async (req: Request, res: Response) => {
     return;
   }
 
-  const basic = toNumber(body.basic, 0);
-  const allowances = toNumber(body.allowances, 0);
-  const deductions = toNumber(body.deductions, 0);
-  const netPay = toNumber(body.netPay, basic + allowances - deductions);
+  const salarySeed = getSalarySeed(userDoc);
+  const basic = toNonNegativeNumber(body.basic ?? salarySeed.basic);
+  const allowances = toNonNegativeNumber(body.allowances ?? salarySeed.allowances);
+  const deductions = toNonNegativeNumber(body.deductions ?? salarySeed.deductions);
+  const calculatedNetPay = Math.max(0, basic + allowances - deductions);
+  const netPay = toNonNegativeNumber(body.netPay ?? salarySeed.netPay ?? calculatedNetPay);
 
   const resolvedMonthKey = monthKeyRaw || toMonthKey(monthDate);
   const resolvedMonthLabel = String(body.monthLabel || toMonthLabel(monthDate));
