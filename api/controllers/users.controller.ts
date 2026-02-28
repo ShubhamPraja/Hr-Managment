@@ -5,6 +5,93 @@ import { hashPassword } from '../lib/auth-utils';
 import { getUserModel } from '../models/User';
 import { resolveTenantOrFail } from './shared';
 
+type SalaryBreakup = {
+  basic: number;
+  hra: number;
+  allowances: number;
+  bonus: number;
+  deductions: number;
+  grossSalary: number;
+  netSalary: number;
+};
+
+const toNumber = (value: unknown, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const normalizeEmployeeType = (value: unknown) => {
+  const cleanValue = String(value || '').trim().toLowerCase();
+  if (cleanValue === 'freelancing') return 'Freelancing';
+  if (cleanValue === 'part time' || cleanValue === 'part-time' || cleanValue === 'parttime') return 'Part Time';
+  if (
+    cleanValue === 'on contract' ||
+    cleanValue === 'contract' ||
+    cleanValue === 'on-contract' ||
+    cleanValue === 'contractual'
+  ) {
+    return 'On Contract';
+  }
+  return 'Full Time';
+};
+
+const normalizeEmployeeCode = (value: unknown) => String(value || '').trim().toUpperCase().replace(/\s+/g, '');
+
+const normalizeCountryCode = (value: unknown) => {
+  const cleanValue = String(value || '').trim();
+  const digits = cleanValue.replace(/\D/g, '');
+  if (!digits) return '+1';
+  return `+${digits}`;
+};
+
+const normalizePhoneNumber = (value: unknown) => String(value || '').replace(/\D/g, '');
+
+const normalizeSalaryBreakup = (value: unknown): SalaryBreakup => {
+  const source = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+  const basic = Math.max(0, toNumber(source.basic, 0));
+  const hra = Math.max(0, toNumber(source.hra, 0));
+  const allowances = Math.max(0, toNumber(source.allowances, 0));
+  const bonus = Math.max(0, toNumber(source.bonus, 0));
+  const deductions = Math.max(0, toNumber(source.deductions, 0));
+  const grossSalary = basic + hra + allowances + bonus;
+  const netSalary = Math.max(0, grossSalary - deductions);
+
+  return {
+    basic,
+    hra,
+    allowances,
+    bonus,
+    deductions,
+    grossSalary,
+    netSalary,
+  };
+};
+
+const generateEmployeeCode = async (User: any, organizationId: unknown) => {
+  const year = new Date().getFullYear();
+  const prefix = `EMP-${year}-`;
+  const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const usersWithCode = await (User as any)
+    .find({
+      organizationId,
+      employeeCode: { $regex: new RegExp(`^${escapedPrefix}`) },
+    })
+    .select('employeeCode')
+    .lean();
+
+  let maxSequence = 0;
+  usersWithCode.forEach((item: any) => {
+    const code = String(item?.employeeCode || '');
+    if (!code.startsWith(prefix)) return;
+    const sequence = Number(code.slice(prefix.length));
+    if (Number.isInteger(sequence)) {
+      maxSequence = Math.max(maxSequence, sequence);
+    }
+  });
+
+  return `${prefix}${String(maxSequence + 1).padStart(4, '0')}`;
+};
+
 const sanitizeUser = (user: any) => ({
   _id: user._id,
   name: user.name,
@@ -14,6 +101,12 @@ const sanitizeUser = (user: any) => ({
   designation: user.designation,
   organizationId: user.organizationId,
   avatar: user.avatar,
+  phoneCountryCode: user.phoneCountryCode || '+1',
+  phoneNumber: user.phoneNumber || '',
+  mobileNumber: user.phoneNumber ? `${user.phoneCountryCode || '+1'} ${user.phoneNumber}` : '',
+  employeeCode: user.employeeCode,
+  employeeType: user.employeeType || 'Full Time',
+  salaryBreakup: normalizeSalaryBreakup(user.salaryBreakup),
   status: user.status,
   joinDate: user.joinDate,
 });
@@ -34,7 +127,7 @@ export const getUsers = async (req: Request, res: Response) => {
   const User = getUserModel(tenantConnection);
 
   const users = await (User as any).find({ organizationId }).select('-password');
-  res.status(200).json({ users });
+  res.status(200).json({ users: users.map(sanitizeUser) });
 };
 
 export const createUser = async (req: Request, res: Response) => {
@@ -50,7 +143,7 @@ export const createUser = async (req: Request, res: Response) => {
   const actorRole = String(body.creatorRole || 'Employee');
 
   if (!name || !email || !password) {
-    res.status(400).json({ message: 'name, email, password, and organizationId are required' });
+    res.status(400).json({ message: 'name, email, and password are required' });
     return;
   }
 
@@ -76,6 +169,29 @@ export const createUser = async (req: Request, res: Response) => {
   const { tenantConnection } = tenantScope;
   const User = getUserModel(tenantConnection);
   const hashedPassword = await hashPassword(password);
+  const requestedEmployeeCode = normalizeEmployeeCode(body.employeeCode);
+
+  if (requestedEmployeeCode) {
+    const existingCode = await (User as any).findOne({
+      organizationId,
+      employeeCode: requestedEmployeeCode,
+    });
+    if (existingCode) {
+      res.status(409).json({ message: 'Employee code already exists' });
+      return;
+    }
+  }
+
+  const employeeCode = requestedEmployeeCode || (await generateEmployeeCode(User, organizationId));
+  const employeeType = normalizeEmployeeType(body.employeeType);
+  const salaryBreakup = normalizeSalaryBreakup(body.salaryBreakup);
+  const phoneCountryCode = normalizeCountryCode(body.phoneCountryCode);
+  const phoneNumber = normalizePhoneNumber(body.phoneNumber);
+
+  if (phoneNumber && (phoneNumber.length < 6 || phoneNumber.length > 15)) {
+    res.status(400).json({ message: 'Phone number must be between 6 and 15 digits' });
+    return;
+  }
 
   const created = await (User as any).create({
     name,
@@ -86,6 +202,11 @@ export const createUser = async (req: Request, res: Response) => {
     department: body.department,
     designation: body.designation,
     avatar: body.avatar,
+    phoneCountryCode,
+    phoneNumber,
+    employeeCode,
+    employeeType,
+    salaryBreakup,
     status: body.status || 'Active',
     joinDate: body.joinDate,
   });
@@ -148,6 +269,58 @@ export const updateUser = async (req: Request, res: Response) => {
   if (typeof body.avatar === 'string') targetUser.avatar = body.avatar;
   if (typeof body.status === 'string') targetUser.status = body.status;
   if (body.joinDate) targetUser.joinDate = body.joinDate;
+
+  if (typeof body.phoneCountryCode === 'string') {
+    targetUser.phoneCountryCode = normalizeCountryCode(body.phoneCountryCode);
+  }
+
+  if (typeof body.phoneNumber === 'string') {
+    const phoneNumber = normalizePhoneNumber(body.phoneNumber);
+    if (phoneNumber && (phoneNumber.length < 6 || phoneNumber.length > 15)) {
+      res.status(400).json({ message: 'Phone number must be between 6 and 15 digits' });
+      return;
+    }
+    targetUser.phoneNumber = phoneNumber;
+  }
+
+  if (typeof body.employeeCode === 'string') {
+    const requestedEmployeeCode = normalizeEmployeeCode(body.employeeCode);
+    if (!requestedEmployeeCode) {
+      res.status(400).json({ message: 'employeeCode cannot be empty' });
+      return;
+    }
+
+    if (requestedEmployeeCode !== String(targetUser.employeeCode || '')) {
+      const sameOrgCode = await (User as any).findOne({ organizationId, employeeCode: requestedEmployeeCode });
+      if (sameOrgCode && String(sameOrgCode._id) !== String(targetUser._id)) {
+        res.status(409).json({ message: 'Employee code already exists' });
+        return;
+      }
+    }
+
+    targetUser.employeeCode = requestedEmployeeCode;
+  }
+
+  if (typeof body.employeeType === 'string') {
+    targetUser.employeeType = normalizeEmployeeType(body.employeeType);
+  }
+
+  if (body.salaryBreakup && typeof body.salaryBreakup === 'object') {
+    const currentSalaryBreakup =
+      targetUser.salaryBreakup?.toObject?.() ||
+      targetUser.salaryBreakup || {
+        basic: 0,
+        hra: 0,
+        allowances: 0,
+        bonus: 0,
+        deductions: 0,
+      };
+
+    targetUser.salaryBreakup = normalizeSalaryBreakup({
+      ...currentSalaryBreakup,
+      ...(body.salaryBreakup as Record<string, unknown>),
+    });
+  }
 
   if (typeof body.email === 'string') {
     const cleanEmail = body.email.trim().toLowerCase();
